@@ -66,7 +66,6 @@ public class TextValidator {
       case REGEX:
         return srcValues.get(0).matches(getPatternValue());
       case UDM:
-        // TODO: User defined function, will match using an external script
         return false;
       default:
         return false;

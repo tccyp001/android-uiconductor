@@ -18,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 /** Icon images trained for validation. */
 public enum IconImageType {
-  // TODO(b/139136849): implement a dynamic type after confirming basic functionality
   BLUE_DOT("BLUE_DOT"),
   UNKNOWN("Unknown");
 

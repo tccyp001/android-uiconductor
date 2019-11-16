@@ -18,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * ScrollDirectionType for swipe and scroll related actions TODO(tccyp): change to same parttern as
  * other enum, need have a Santinizer to make sure old action still works
  */
 public enum ScrollDirectionType {

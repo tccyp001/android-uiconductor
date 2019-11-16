@@ -120,7 +120,6 @@ public abstract class ActionStorageManager {
       cachedMap.putIfAbsent(action.getActionId().toString(), action);
       return saveActions(ImmutableList.of(action));
     } catch (UicdActionException e) {
-      // TODO(tccyp): need throw the exception to controller and pass the frontend.
       logger.severe("Failed to add action");
     }
     return false;

@@ -104,7 +104,6 @@ public class Device {
 
   private int deviceIndex;
 
-  // TODO(tccyp), change to deviceDimension
   private int width;
   private int height;
   private String product;

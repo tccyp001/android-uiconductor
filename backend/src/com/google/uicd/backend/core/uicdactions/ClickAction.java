@@ -17,6 +17,7 @@ package com.google.uicd.backend.core.uicdactions;
 import com.google.uicd.backend.core.constants.StrategyType;
 import com.google.uicd.backend.core.devicesdriver.AndroidDeviceDriver;
 import com.google.uicd.backend.core.exceptions.UicdDeviceHttpConnectionResetException;
+import com.google.uicd.backend.core.uicdactions.ActionContext.PlayStatus;
 import com.google.uicd.backend.core.xmlparser.NodeContext;
 import com.google.uicd.backend.core.xmlparser.Position;
 import com.google.uicd.backend.core.xmlparser.XmlHelper;
@@ -34,11 +35,17 @@ public class ClickAction extends BaseAction {
       this.setName(nodeContext.getDisplayEstimate());
     }
     this.isDoubleClick = isDoubleClick;
+    this.failTestIfNotFound = true;
   }
 
   public NodeContext nodeContext;
   private boolean isRawXY = false;
   private boolean isDoubleClick = false;
+
+  // For backward compatibility, origin logic was if our engine can not found the element it will
+  // just skip current step, but we want to fail the test faster so that it won't confuse users.
+  // 
+  private boolean failTestIfNotFound = false;
 
   private boolean isByElement;
   private StrategyType strategy;
@@ -52,6 +59,7 @@ public class ClickAction extends BaseAction {
       this.isRawXY = otherAction.isRawXY;
       this.strategy = otherAction.strategy;
       this.selector = otherAction.selector;
+      this.failTestIfNotFound = true;
     }
   }
 
@@ -94,10 +102,35 @@ public class ClickAction extends BaseAction {
               this.nodeContext,
               androidDeviceDriver.getWidthRatio(),
               androidDeviceDriver.getHeightRatio());
+
+      if (failTestIfNotFound && !pos.isValidPos()) {
+        actionContext.setFailStatus(androidDeviceDriver.getDeviceId());
+        this.playStatus = ActionContext.PlayStatus.FAIL;
+        return -1;
+      }
       logger.info(String.format("Position from xml engine: (x:%f, y:%f)", pos.x, pos.y));
       androidDeviceDriver.clickDevice((int) pos.x, (int) pos.y, isDoubleClick);
     }
 
     return 0;
+  }
+
+  @Override
+  protected ActionExecutionResult genActionExecutionResults(
+      AndroidDeviceDriver androidDeviceDriver, ActionContext actionContext) {
+
+    if (this.playStatus != PlayStatus.FAIL) {
+      return super.genActionExecutionResults(androidDeviceDriver, actionContext);
+    }
+    ActionExecutionResult actionExecutionResult = new ActionExecutionResult();
+    String targetText = "";
+    if (this.nodeContext != null) {
+      targetText = this.nodeContext.getDisplayEstimate();
+    }
+    String logContent = String.format("Can not find element in xml, looking for: '%s'", targetText);
+    actionExecutionResult.setRegularOutput(logContent);
+    actionExecutionResult.setActionId(this.getActionId().toString());
+    actionExecutionResult.setPlayStatus(this.playStatus);
+    return actionExecutionResult;
   }
 }

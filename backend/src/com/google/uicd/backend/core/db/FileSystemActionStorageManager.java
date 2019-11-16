@@ -24,7 +24,6 @@ public class FileSystemActionStorageManager extends ActionStorageManager {
   @Override
   public List<BaseAction> getBaseActionsFromStorage(List<String> actionIdList)
       throws UicdActionException {
-    //TODO(sophiez): move the base logic into db class, this one only loadMapFromString
     throw new UicdActionException("Not implemented!");
   }
 

@@ -110,7 +110,6 @@ public abstract class ValidationAction extends BaseAction implements IValidatorA
     this.validationResult = validate(actionContext, androidDeviceDriver);
     if (!this.validationResult) {
       if (isStopCurrentLevel()) {
-        // TODO(b/112010063): Move playStatus outside the action itself, it will not work
         // properly with multithreading.
         this.playStatus = PlayStatus.EXIT_CURRENT_COMPOUND;
       } else {

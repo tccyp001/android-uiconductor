@@ -350,4 +350,3 @@ public class ADBCommandLineUtil {
     return getDeviceProperty(deviceId, "ro.build.product");
   }
 }
-                                                                                                    

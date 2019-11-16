@@ -46,6 +46,7 @@ public enum ActionType {
   SNIPPET_VALIDATION_ACTION("SnippetValidationAction"),
   SWIPE_ACTION("SwipeAction"),
   UNKNOWN("Unknown"),
+  WAIT_ACTION("WaitAction"),
   ZOOM_ACTION("ZoomAction");
   // go/keep-sorted end
 

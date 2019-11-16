@@ -54,7 +54,6 @@ public class ScriptExecutionAction extends BaseAction {
   private static final String SCRIPT_FILE_TEMPORARY_NAME = "python_script.py";
 
   private String scriptCodeContent;
-  // TODO(b/116255138): Rename to executionTimeoutSec
   private int commandlineExecutionTimeoutSec;
   private String arguments;
 

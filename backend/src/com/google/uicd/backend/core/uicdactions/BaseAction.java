@@ -25,6 +25,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
 import com.google.uicd.backend.core.config.UicdConfig;
 import com.google.uicd.backend.core.constants.ActionType;
 import com.google.uicd.backend.core.constants.JsonFlag;
@@ -81,6 +82,8 @@ import java.util.logging.Logger;
   @JsonSubTypes.Type(value = ScriptExecutionAction.class, name = "ScriptExecutionAction"),
   @JsonSubTypes.Type(value = MLImageValidationAction.class, name = "MLImageValidationAction"),
   @JsonSubTypes.Type(value = DoubleTapPowerButtonAction.class, name = "DoubleTapPowerButtonAction"),
+  @JsonSubTypes.Type(value = WaitAction.class, name = "WaitAction"),
+  @JsonSubTypes.Type(value = ConditionValidationAction.class, name = "ConditionValidationAction"),
 })
 /**
  * BaseAction class In uicd every test step is one action. This is the base class for all actions
@@ -226,7 +229,7 @@ public abstract class BaseAction {
       throws UicdDeviceException {
     AndroidDeviceDriver androidDeviceDriver =
         getAndroidDeviceDriver(deviceDrivers, actionContext, dIndex);
-    logActionStart();
+    logActionStart(actionContext);
     if (needSkipAction(androidDeviceDriver, actionContext)) {
       playStatus = PlayStatus.SKIPPED;
     } else {
@@ -238,7 +241,7 @@ public abstract class BaseAction {
       waitAfter(actionContext);
     }
 
-    logActionEnd();
+    logActionEnd(actionContext);
     if (playStatus == ActionContext.PlayStatus.READY) {
       playStatus = ActionContext.PlayStatus.PASS;
     }
@@ -273,13 +276,21 @@ public abstract class BaseAction {
     return jsonDataString;
   }
 
-  void logActionStart() {
+  void logActionStart(ActionContext actionContext) {
     logger.info("Start Action, UUID: " + this.getActionId());
     logger.info(this.getActionType() + ": " + this.getDisplay());
+    actionContext.getCurrentPlayingPath().add(actionContext.getCurrentPlayActionIndex());
+    logger.info(
+        "Start Action Path: " + Joiner.on("->").join(actionContext.getCurrentPlayingPath()));
+    actionContext.getCurrentPlayingPath().removeLast();
   }
 
-  void logActionEnd() {
+  void logActionEnd(ActionContext actionContext) {
     logger.info("End Action, UUID: " + this.getActionId());
+    actionContext.getCurrentPlayingPath().add(actionContext.getCurrentPlayActionIndex());
+    actionContext.increaseCurrentPlayActionIndex();
+    logger.info("End Action Path: " + Joiner.on("->").join(actionContext.getCurrentPlayingPath()));
+    actionContext.getCurrentPlayingPath().removeLast();
   }
 
   protected ActionExecutionResult genActionExecutionResults(
@@ -292,10 +303,11 @@ public abstract class BaseAction {
     return actionExecutionResult;
   }
 
-  protected void updateCommonFields(BaseAction baseAction) {
+  public void updateCommonFields(BaseAction baseAction) {
     this.setName(baseAction.getName());
     this.setActionDescription(baseAction.getActionDescription());
     this.setDelayAfterActionMs(baseAction.getDelayAfterActionMs());
+    this.setDeviceIndex(baseAction.getDeviceIndex());
     this.runAlways = baseAction.runAlways;
   }
 

@@ -14,7 +14,6 @@
 
 package com.google.uicd.backend.core.utils;
 
-//TODO(b/139209459): Think about using AutoValue
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /** The circular shape of selected region on the UI for comparison */

@@ -62,7 +62,6 @@ public class GlobalVariableValidationAction extends ValidationAction {
 
     // To use advanced expression, need a converter to do the trick, the expression will be like
     // "uicdTypeConverter.toInt($uicd_var1) + uicdTypeConverter.toInt($uicd_var2)";
-    // TODO(tccyp): This is real advanced feature, we might change to another engine in the future.
     if (expression.contains(TYPE_CONVERTER_OBJ_KEYWORD)) {
       jc.set(TYPE_CONVERTER_OBJ_KEYWORD, new UicdTypeConverter());
     }

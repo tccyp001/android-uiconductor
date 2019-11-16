@@ -87,7 +87,6 @@ public class Bounds {
   }
 
   /**
-   * TODO(jacksun) what is this for
    */
   public Bounds getNearByBounds(double ratio) {
     double xx1 = Math.max(this.getCenter().x - this.getWidth() / 2.0 * (1.0 + ratio), 0.0);

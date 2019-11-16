@@ -18,6 +18,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.uicd.backend.core.config.UicdConfig;
 import com.google.uicd.backend.core.globalvariables.UicdGlobalVariableMap;
 import java.nio.file.Paths;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -38,6 +40,12 @@ public class ActionContext {
   private boolean cancelRequested = false;
   private double playSpeedFactor = 1.0;
   private static final String PNG_EXTENSION = ".png";
+
+  /* Use this field only for the frontend highlight feature, sometimes we will have a workflow
+   * contains two same compound actions, we need use index to figure out which one to highlight
+   */
+  private int currentPlayActionIndex = 0;
+  private final Deque<Integer> currentPlayingPath = new ArrayDeque<>();
 
   private UicdGlobalVariableMap globalVariableMap = new UicdGlobalVariableMap();
 
@@ -155,6 +163,22 @@ public class ActionContext {
             this.getExecutionId().toString(),
             this.getCurrentPlayingActionId() + PNG_EXTENSION)
         .toString();
+  }
+
+  public int getCurrentPlayActionIndex() {
+    return currentPlayActionIndex;
+  }
+
+  public void setCurrentPlayActionIndex(int currentPlayActionIndex) {
+    this.currentPlayActionIndex = currentPlayActionIndex;
+  }
+
+  public void increaseCurrentPlayActionIndex() {
+    this.currentPlayActionIndex++;
+  }
+
+  public Deque<Integer> getCurrentPlayingPath() {
+    return currentPlayingPath;
   }
 
   /**

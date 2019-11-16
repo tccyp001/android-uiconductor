@@ -55,7 +55,7 @@ public class Position {
   }
 
   public boolean isValidPos() {
-    return x >= 0 && y >= 0;
+    return x > 0 && y > 0;
   }
 
   @Override

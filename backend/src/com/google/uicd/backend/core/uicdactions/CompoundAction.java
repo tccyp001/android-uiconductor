@@ -33,6 +33,7 @@ public class CompoundAction extends BaseAction implements Cloneable {
   public List<String> childrenIdList = new ArrayList<>();
   private int repeatTime = 1;
   private boolean failAtTheEnd = false;
+  private boolean forceDeviceOnChildren = false;
   private final AdditionalData additionalData = new AdditionalData();
 
   @Override
@@ -73,11 +74,19 @@ public class CompoundAction extends BaseAction implements Cloneable {
     actionExecutionResult.setRegularOutput(this.getDisplay());
     actionExecutionResult.setOutputType(ActionExecutionResult.OutputType.COMPOUND);
     actionExecutionResult.setActionId(this.getActionId().toString());
-    logActionStart();
+    logActionStart(actionContext);
 
     playStatus = ActionContext.PlayStatus.READY;
     boolean stopCurrentLevel = false;
 
+    // If user is doing "play from here", we pass in the offset index.
+    if (actionContext.getCurrentPlayingPath().isEmpty()
+        && actionContext.getCurrentPlayActionIndex() > 0) {
+      actionContext.getCurrentPlayingPath().add(0);
+    } else {
+      actionContext.getCurrentPlayingPath().add(actionContext.getCurrentPlayActionIndex());
+      actionContext.setCurrentPlayActionIndex(0);
+    }
     for (int i = 0; i < repeatTime; i++) {
       for (BaseAction action : childrenActions) {
         // Update currently playing action ID.
@@ -87,7 +96,6 @@ public class CompoundAction extends BaseAction implements Cloneable {
           action.playStatus = PlayStatus.SKIPPED;
         } else {
           // Reset the playStatus. Action is always in memory, we need to clear the status before
-          // running the action. TODO(b/112010063): Move playStatus outside action.
           action.playStatus = PlayStatus.READY;
         }
 
@@ -103,9 +111,16 @@ public class CompoundAction extends BaseAction implements Cloneable {
           actionExecutionResult.addChildResult(childResult);
         } else {
           ActionExecutionResult childResult;
-          // for multi-device, child action has to figure out the index by itself.
           if (actionContext.getPlayMode() == PlayMode.MULTIDEVICE) {
-            childResult = action.playWithDelay(deviceDrivers, actionContext);
+            if (forceDeviceOnChildren) {
+              // use Single play mode for this subtree to force specific device
+              actionContext.setPlayMode(PlayMode.SINGLE);
+              childResult = action.playWithDelay(deviceDrivers, actionContext, deviceIndex);
+              actionContext.setPlayMode(PlayMode.MULTIDEVICE);
+            } else {
+              // otherwise child action has to figure out the index by itself.
+              childResult = action.playWithDelay(deviceDrivers, actionContext);
+            }
           } else {
             childResult = action.playWithDelay(deviceDrivers, actionContext, deviceIndex);
           }
@@ -118,7 +133,11 @@ public class CompoundAction extends BaseAction implements Cloneable {
       // wait for single repeat
       waitAfter(actionContext);
     }
-    logActionEnd();
+
+    actionContext.setCurrentPlayActionIndex(actionContext.getCurrentPlayingPath().getLast());
+    actionContext.getCurrentPlayingPath().removeLast();
+
+    logActionEnd(actionContext);
     for (ActionExecutionResult childRes : actionExecutionResult.getChildrenResult()) {
       if (childRes.getPlayStatus() == ActionContext.PlayStatus.FAIL) {
         actionExecutionResult.setPlayStatus(ActionContext.PlayStatus.FAIL);
@@ -167,6 +186,7 @@ public class CompoundAction extends BaseAction implements Cloneable {
       CompoundAction otherAction = (CompoundAction) baseAction;
       this.repeatTime = otherAction.repeatTime;
       this.failAtTheEnd = otherAction.failAtTheEnd;
+      this.forceDeviceOnChildren = otherAction.forceDeviceOnChildren;
 
       // reorder current action list based on list order of input
       HashMap<UUID, BaseAction> map = new HashMap<>();

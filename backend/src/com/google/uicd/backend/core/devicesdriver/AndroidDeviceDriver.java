@@ -82,7 +82,6 @@ public class AndroidDeviceDriver {
   private static final Set<String> TV_DEVICE_TYPES = new HashSet<>(Arrays.asList("fugu", "elfin"));
   private static final Set<String> AUTO_DEVICE_TYPES =
       new HashSet<>(Arrays.asList("bat_land", "bat", "hawk"));
-  // TODO(yuchenhe): add wearable product types
   private static final Set<String> WEARABLE_DEVICE_TYPES = new HashSet<>(Arrays.asList());
   private static final boolean DOUBLE_CLICK = true;
 
@@ -452,7 +451,6 @@ public class AndroidDeviceDriver {
     return c;
   }
 
-  // TODO(yuchenhe) provide better way to detect devicetype
   public DeviceDimension setScaleByDeviceType() {
     int originalWidth = device.getWidth();
     int originalHeight = device.getHeight();

@@ -81,7 +81,6 @@ public class ActionPlayer {
                     if (result != null) {
                       return result;
                     } else {
-                      // TODO(tccyp): better exception handling.
                       logger.warning(
                           "Play All Mode: Some device failed. Please check devices manually.");
                       return null;

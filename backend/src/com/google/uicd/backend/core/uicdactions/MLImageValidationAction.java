@@ -71,7 +71,6 @@ public class MLImageValidationAction extends ScreenContentValidationAction {
     return 0;
   }
 
-  // TODO(b/139136919): fix silent failures in methods that call validateRaw
   @Override
   protected boolean validateRaw(
       ActionContext actionContext, AndroidDeviceDriver androidDeviceDriver) {

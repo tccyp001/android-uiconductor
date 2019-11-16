@@ -59,7 +59,7 @@ public class UicdGlobalVariableMap {
   private static final String INPUT_PATH_KEYWORD = "input_path";
 
   private static final String KEY_VALUE_SPLITTER = "=";
-  private static final String VARIABLE_SPLITTER = ",";
+  private static final String VARIABLE_SPLITTER = "[,|\\r?\\n]";
 
   // Used by MH driver
   public static final String UICD_GLOBAL_KEY_SPONGE_LINK = "$uicd_sponge_link";
@@ -164,7 +164,6 @@ public class UicdGlobalVariableMap {
 
     abstract boolean exportField();
 
-    // TODO(b/139164551): change exportField to isInternal
     @JsonCreator
     static UicdGlobalVariableValue create(
         @JsonProperty("value") String value, @JsonProperty("exportField") boolean exportField) {

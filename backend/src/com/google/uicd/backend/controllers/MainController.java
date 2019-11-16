@@ -37,6 +37,7 @@ import com.google.uicd.backend.core.exceptions.UicdDeviceException;
 import com.google.uicd.backend.core.exceptions.UicdExternalCommandException;
 import com.google.uicd.backend.core.uicdactions.ValidationReqDetails;
 import com.google.uicd.backend.core.utils.ADBCommandLineUtil;
+import com.google.uicd.backend.core.utils.JsonUtil;
 import com.google.uicd.backend.core.utils.UicdCoreDelegator;
 import com.google.uicd.backend.core.xmlparser.Bounds;
 import com.google.uicd.backend.recorder.services.ProjectManager;
@@ -322,6 +323,12 @@ public class MainController {
   }
 
   @CrossOrigin(origins = "*")
+  @RequestMapping("/getPlayMode")
+  public String getPlayMode() {
+    return JsonUtil.toJson(workflowManager.getPlayMode());
+  }
+
+  @CrossOrigin(origins = "*")
   @RequestMapping("/removeLastAction")
   public String setPlayMode() {
     workflowManager.removeLastAction();
@@ -510,7 +517,6 @@ public class MainController {
     return () -> DevicesStatusResponse.create(devicesDriverManager.getDevicesStatusDetails());
   }
 
-  // TODO(tccyp): after migrate to new frontend, we need to clean up all the init apis, only need
   // one api.
   @CrossOrigin(origins = "*")
   @RequestMapping("/initDevicesFromListV2")
@@ -548,7 +554,6 @@ public class MainController {
     }
   }
 
-  // TODO(tccyp): after migrate to new frontend, we need to clean up all the init apis, only need
   // one api.
   @CrossOrigin(origins = "*")
   @RequestMapping("/initDevicesFromList")
@@ -628,7 +633,6 @@ public class MainController {
       @RequestParam(value = "y1") Integer y1,
       @RequestParam(value = "x2") Integer x2,
       @RequestParam(value = "y2") Integer y2,
-      // TODO: change isZoomin to enum(Zoomin/out)
       @RequestParam(value = "isZoomIn") Boolean isZoomin) {
     return () -> {
       workflowManager.recordAndZoom(x1, y1, x2, y2, isZoomin);
@@ -656,7 +660,7 @@ public class MainController {
         workflowManager.recordAndSwipe(midX, maxY, midX, midY);
       } else if (direction.equalsIgnoreCase("down")) {
         // There is an issue for devices with notch, swipe down from the top middle might not work,
-        // swipe down from the top left as temp solution. see b/111322864 for more details.
+        // swipe down from the top left as temp solution. see  for more details.
         workflowManager.recordAndSwipe(minX, minY, minX, midY);
       }
       return DONE;
@@ -698,7 +702,6 @@ public class MainController {
     return () -> {
       HashMap<String, String> versionInfo = new HashMap<>();
       versionInfo.put("Uicd", UicdConstant.UICD_VERSION);
-      // TODO(tccyp): detele xmlDumper and Uicd fields once we publish new version of FE.
       versionInfo.put("backendVersion", UicdConstant.UICD_VERSION);
       String xmlDumperApkVersion = "";
       for (String deviceId : devicesDriverManager.initXmlDumperDevices) {
@@ -714,7 +717,6 @@ public class MainController {
       }
 
       versionInfo.put("xmlDumper", xmlDumperApkVersion);
-      // TODO(tccyp): detele xmlDumper and Uicd fields once we publish new version of FE.
       versionInfo.put("xmlDumperVersion", xmlDumperApkVersion);
       return new ObjectMapper().writeValueAsString(versionInfo);
     };

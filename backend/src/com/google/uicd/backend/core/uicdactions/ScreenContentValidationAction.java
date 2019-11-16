@@ -99,7 +99,6 @@ public class ScreenContentValidationAction extends ValidationAction {
           new TextValidator(this.selectedText, validationReqDetails.getContentMatchType());
       this.setTextValidator(textValidator);
     }
-
   }
 
   protected void clear() {
@@ -152,7 +151,6 @@ public class ScreenContentValidationAction extends ValidationAction {
     this.selectedText = selectedText;
   }
 
-  // TODO  need change the content from nearby
   @Override
   protected boolean validateRaw(
       ActionContext actionContext, AndroidDeviceDriver androidDeviceDriver)
@@ -285,7 +283,6 @@ public class ScreenContentValidationAction extends ValidationAction {
     actionExecutionResult.setRegularOutput(logContent);
     actionExecutionResult.setActionId(this.getActionId().toString());
     actionExecutionResult.setPlayStatus(this.playStatus);
-    // TODO yuchen Also save to log service?
     return actionExecutionResult;
   }
 
